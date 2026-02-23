@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation} from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Login.css';
 
@@ -10,28 +10,23 @@ function Login() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { login } = useAuth();
-
+  const location = useLocation();
+  const from = location.state?.from || '/';
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
-
-    // Basic validation
     if (!username.trim() || !password.trim()) {
       setError('Please enter both username and password');
       return;
     }
 
-    // Mock authentication - accepts any username/password
-    // In a real app, this would validate against a backend
     try {
       login(username, password, selectedRole);
-      // Redirect to saved articles after successful login
-      navigate('/saved');
+      navigate(from, { replace: true });
     } catch (err) {
       setError('Login failed. Please try again.');
     }
   };
-
   return (
     <div className="login-container">
       <div className="login-card">
@@ -71,7 +66,7 @@ function Login() {
               onChange={(e) => setSelectedRole(e.target.value)}
             >
               <option value="regular">Regular User</option>
-              <option value="premium">Premium User</option>
+              <option value="admin">Admin</option>
             </select>
           </div>
 
@@ -80,11 +75,6 @@ function Login() {
           </button>
         </form>
 
-        <div className="demo-accounts">
-          <p className="demo-title">Demo Accounts (for testing):</p>
-          <p>Any username/password combination will work</p>
-          <p>Select "Regular" or "Premium" to test different access levels</p>
-        </div>
       </div>
     </div>
   );
